@@ -35,6 +35,11 @@ public class MSConsumerController {
 		return consumerRepo.findAll();			
 	}
 	
+	@GetMapping("/getMessage")
+	public String getMessageToShow() {
+		return "show message";			
+	}
+	
 	@DeleteMapping("/deleteData")
 	public void deleteData() {
 		 consumerRepo.deleteAll();			
