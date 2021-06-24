@@ -21,7 +21,7 @@ public class ConsumerService {
 	private ConfirmationRepository confirmationRepo;
 	
 	
-	public void processData() {
+public void processData() {
 		List<Confirmation> confirmations = confirmationRepo.findAll();
 		List<String> ids = new ArrayList<>();		
 		List<DataStore> data = consumerRepo.findAll();
@@ -35,10 +35,14 @@ public class ConsumerService {
 			
 			if(ids!=null && ids.size()>0) {
 				if(!ids.contains(confirmation.getId())) {
-					consumerRepo.save(store);
+					if(store.getConfStatus().equalsIgnoreCase("COMPLETED")) {
+						consumerRepo.save(store);
+					}				
 				}
 			}else {
-				consumerRepo.save(store);
+				if(store.getConfStatus().equalsIgnoreCase("COMPLETED")) {
+					consumerRepo.save(store);
+				}	
 			}			
 			
 		}
