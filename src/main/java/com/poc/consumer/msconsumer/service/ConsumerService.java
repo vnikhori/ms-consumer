@@ -1,28 +1,53 @@
-package com.poc.consumer.msconsumer.resources;
+package com.poc.consumer.msconsumer.service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import com.poc.consumer.msconsumer.service.ConsumerService;
+import com.poc.consumer.msconsumer.model.data.Confirmation;
+import com.poc.consumer.msconsumer.model.data.DataStore;
+import com.poc.consumer.msconsumer.repository.ConfirmationRepository;
+import com.poc.consumer.msconsumer.repository.ConsumerRepository;
 
-@Component
-@Configuration
-public class MSConsumer {	
+
+@Service
+public class ConsumerService {
 	
 	@Autowired
-	private ConsumerService service;
+	private ConsumerRepository consumerRepo;
+	
+	@Autowired
+	private ConfirmationRepository confirmationRepo;
 	
 	
-	@Scheduled(fixedDelay = 60000)
-	public void startScheduler() {
-		System.out.println("starting......");
-		service.processData();
-		System.out.println("finished......");
-
+	public void processData() {
+		List<Confirmation> confirmations = confirmationRepo.findAll();
+		List<String> ids = new ArrayList<>();		
+		List<DataStore> data = consumerRepo.findAll();
+		for(DataStore one:data) {
+			ids.add(one.getId());
+		}
+		for(Confirmation confirmation:confirmations) {
+			DataStore store = new DataStore(confirmation.getId(), confirmation.getRequestDateTime(), confirmation.getRequestMessageId(), confirmation.getCollectionUpdatedDateTime(), 
+					confirmation.getConfStatus(), confirmation.getConfirmationDateTime(), confirmation.getMessageDesc(), confirmation.getMessageStatusDateTime(), confirmation.getOptionalFields(),
+					confirmation.getOrigPaymentAmount(), confirmation.getOriginalValueDate(), confirmation.getPaymentAmount());
+			
+			if(ids!=null && ids.size()>0) {
+				if(!ids.contains(confirmation.getId())) {
+					if(store.getConfStatus().equalsIgnoreCase("COMPLETED")) {
+						consumerRepo.save(store);
+					}				
+				}
+			}else {
+				if(store.getConfStatus().equalsIgnoreCase("COMPLETED")) {
+					consumerRepo.save(store);
+				}	
+			}			
+			
+		}
+		
 	}
-	
-	
 
 }
