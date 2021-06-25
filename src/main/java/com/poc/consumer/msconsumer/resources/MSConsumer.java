@@ -15,11 +15,14 @@ public class MSConsumer {
 	private ConsumerService service;
 	
 	
+	/*
+	 * This Scheduler runs every minute
+	 */
 	@Scheduled(fixedDelay = 60000)
 	public void startScheduler() {
-		System.out.println("starting......");
+		System.out.println("Started data storing process");
 		service.processData();
-		System.out.println("finished......");
+		System.out.println("Completed data storing process");
 
 	}
 	
